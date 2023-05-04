@@ -27,7 +27,7 @@ const Properties = ({ properties }) => {
 export default Properties;
 
 export async function getStaticProps() {
-    const properties = await getProperties(15);
+    const properties = await getProperties(6);
     return {
         props: { properties: properties }
     }
