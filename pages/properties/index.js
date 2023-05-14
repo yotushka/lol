@@ -11,6 +11,31 @@ const PropertiesPage = ({ properties }) => {
     const [baths, setBaths] = useState(null);
     const [filteredProperties, setFilteredProperties] = useState(properties);
 
+    const MAX_REQUESTS_PER_SECOND = 5;
+    const REQUEST_INTERVAL_MS = 1000 / MAX_REQUESTS_PER_SECOND;
+    const requestQueue = [];
+
+    const enqueueRequest = () => {
+        return new Promise((resolve) => {
+            const processRequest = () => {
+                if (requestQueue.length < MAX_REQUESTS_PER_SECOND) {
+                    requestQueue.push(resolve);
+                } else {
+                    setTimeout(processRequest, REQUEST_INTERVAL_MS);
+                }
+            };
+
+            processRequest();
+        });
+    };
+
+    const dequeueRequest = () => {
+        if (requestQueue.length > 0) {
+            const resolve = requestQueue.shift();
+            resolve();
+        }
+    };
+
     const debounce = (func, delay) => {
         let timer;
         return function (...args) {
@@ -34,19 +59,25 @@ const PropertiesPage = ({ properties }) => {
         setFilteredProperties(updatedFilteredProperties);
     }, 300);
 
-    const handlePriceRangeChange = (newPriceRange) => {
+    const handlePriceRangeChange = async (newPriceRange) => {
         setPriceRange(newPriceRange);
-        filterProperties();
+        await enqueueRequest();
+        await filterProperties();
+        dequeueRequest();
     };
 
-    const handleRoomsChange = (newRooms) => {
+    const handleRoomsChange = async (newRooms) => {
         setRooms(newRooms);
-        filterProperties();
+        await enqueueRequest();
+        await filterProperties();
+        dequeueRequest();
     };
 
-    const handleBathsChange = (newBaths) => {
+    const handleBathsChange = async (newBaths) => {
         setBaths(newBaths);
-        filterProperties();
+        await enqueueRequest();
+        await filterProperties();
+        dequeueRequest();
     };
 
     return (
