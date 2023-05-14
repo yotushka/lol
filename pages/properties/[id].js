@@ -1,4 +1,5 @@
 import { usePropertyFormat } from "@/features/common/Hooks/usePropertyFormat";
+import { navigationLinks } from "@/features/common/modules/Navigation/navigationConsts";
 import TextContentBox from "@/features/common/modules/TextContentBox";
 import DefaultLayout from "@/features/Layouts/DefaultLayout";
 import { getProperty } from "@/features/Property/api/getProperty";
@@ -6,8 +7,9 @@ import PropertyMatterPortEmbed from "@/features/Property/components/PropertyMatt
 import PropertyStats from "@/features/Property/components/PropertyStats";
 import PropertyThumbnailSlider from "@/features/Property/components/PropertyThumbnailSlider";
 import PropertyYoutubeEmbed from "@/features/Property/components/PropertyYoutubeEmbed";
-import { Badge, Box, Flex, Grid, GridItem, SimpleGrid, Text } from "@chakra-ui/react";
+import { Badge, Box, Button, Flex, Grid, GridItem, SimpleGrid, Text } from "@chakra-ui/react";
 import { TbMapPin } from "react-icons/tb";
+import Link from 'next/link';
 
 const PropertySingle = ({ property }) => {
     const { address,
@@ -41,7 +43,7 @@ const PropertySingle = ({ property }) => {
                             color="blue.800"
                             textAlign={{ base: "center", sm: "left" }}
                         >
-                            {propertyType} {title}
+                            {propertyType} {title} <MyButton />
                         </Text>
                         <Flex
                             fontSize="xl"
@@ -80,13 +82,26 @@ const PropertySingle = ({ property }) => {
                             </Text>
                         </TextContentBox>
                         <TextContentBox title="Amenities">
+                            {/* <SimpleGrid
+                                columns={{ base: 1, sm: 2 }}
+                                fontWeight="light"
+                                color="gray.600"
+                                fontSize="1rem"
+                            >
+                                {amenities.length ? amenities.map((item) => <Text>
+                                    {item}</Text>) : "Please contact us for more info"}
+                            </SimpleGrid> */}
                             <SimpleGrid
                                 columns={{ base: 1, sm: 2 }}
                                 fontWeight="light"
                                 color="gray.600"
                                 fontSize="1rem"
                             >
-                                {amenities.length ? amenities.map((item) => <Text>{item}</Text>) : "Please contact us for more info"}
+                                {amenities.length ? (
+                                    amenities.map((item, index) => <Text key={index}>{item}</Text>)
+                                ) : (
+                                    "Please contact us for more info"
+                                )}
                             </SimpleGrid>
                         </TextContentBox>
                     </GridItem>
@@ -113,4 +128,21 @@ export async function getServerSideProps(context) {
     return {
         props: { property: property }
     };
+}
+
+function MyButton() {
+    return (
+        <Link href="/contact">
+            <Button
+                _hover={{ backgroundColor: "lightgreen" }}
+                border="1px"
+                borderColor="lightgreen"
+                bgColor="#c6f6d5"
+                fontSize="xl"
+                padding="0.5rem"
+            >
+                Contact Agent
+            </Button>
+        </Link>
+    );
 }

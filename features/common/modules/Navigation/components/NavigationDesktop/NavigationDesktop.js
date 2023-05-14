@@ -27,7 +27,7 @@ const NavigationDesktop = () => {
                     fontWeight="medium"
                 >
                     {navigationLinks.map((item) => (
-                        <NavigationLink key={item.title} {...item} _hover={{ textDecoration: "underline" }} />
+                        <NavigationLink key={item.title} {...item} />
                     ))}
                 </Flex>
             </Flex>
