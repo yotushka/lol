@@ -9,28 +9,44 @@ const PropertiesPage = ({ properties }) => {
     const [priceRange, setPriceRange] = useState([0, Number.MAX_VALUE]);
     const [rooms, setRooms] = useState(null);
     const [baths, setBaths] = useState(null);
+    const [filteredProperties, setFilteredProperties] = useState(properties);
 
-    const filteredProperties = properties.filter((property) => {
-        const price = typeof property.price === 'string' ? parseInt(property.price.replace(/,/g, '')) : parseInt(property.price);
-        const isPriceInRange = price >= priceRange[0] && price <= priceRange[1];
+    const debounce = (func, delay) => {
+        let timer;
+        return function (...args) {
+            clearTimeout(timer);
+            timer = setTimeout(() => func.apply(this, args), delay);
+        };
+    };
 
-        const isRoomsMatch = rooms === null || parseInt(property.rooms) === rooms;
+    const filterProperties = debounce(() => {
+        const updatedFilteredProperties = properties.filter((property) => {
+            const price = typeof property.price === 'string' ? parseInt(property.price.replace(/,/g, '')) : parseInt(property.price);
+            const isPriceInRange = price >= priceRange[0] && price <= priceRange[1];
 
-        const isBathsMatch = baths === null || parseInt(property.baths) === baths;
+            const isRoomsMatch = rooms === null || parseInt(property.rooms) === rooms;
 
-        return isPriceInRange && isRoomsMatch && isBathsMatch;
-    });
+            const isBathsMatch = baths === null || parseInt(property.baths) === baths;
+
+            return isPriceInRange && isRoomsMatch && isBathsMatch;
+        });
+
+        setFilteredProperties(updatedFilteredProperties);
+    }, 300);
 
     const handlePriceRangeChange = (newPriceRange) => {
         setPriceRange(newPriceRange);
+        filterProperties();
     };
 
     const handleRoomsChange = (newRooms) => {
         setRooms(newRooms);
+        filterProperties();
     };
 
     const handleBathsChange = (newBaths) => {
         setBaths(newBaths);
+        filterProperties();
     };
 
     return (
